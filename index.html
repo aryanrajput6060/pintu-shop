@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Pintu Mobile Communication - Complete Shop Management System for sales, staff salary, recharge history, and payment tracking."/>
+  <title>Pintu Mobile Communication - Shop Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <img src="logo.jpg" alt="Pintu Mobile Logo" class="sidebar-logo"/>
+    <div class="sidebar-title">
+      <span class="brand">Pintu Mobile</span>
+      <span class="brand-sub">Communication</span>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">MAIN</div>
+    <a href="#" class="nav-item active" data-page="dashboard">
+      <span class="nav-icon">&#9741;</span><span class="nav-label">Dashboard</span>
+    </a>
+    <a href="#" class="nav-item" data-page="sales">
+      <span class="nav-icon">&#128722;</span><span class="nav-label">Sales</span>
+    </a>
+    <div class="nav-section-label">FINANCE</div>
+    <a href="#" class="nav-item" data-page="payments">
+      <span class="nav-icon">&#128179;</span><span class="nav-label">Payment History</span>
+    </a>
+    <a href="#" class="nav-item" data-page="online-payments">
+      <span class="nav-icon">&#127760;</span><span class="nav-label">Online Payments</span>
+    </a>
+    <a href="#" class="nav-item" data-page="recharge">
+      <span class="nav-icon">&#128241;</span><span class="nav-label">Mobile Recharge</span>
+    </a>
+    <div class="nav-section-label">STAFF</div>
+    <a href="#" class="nav-item" data-page="staff">
+      <span class="nav-icon">&#128100;</span><span class="nav-label">Staff</span>
+    </a>
+    <a href="#" class="nav-item" data-page="salary">
+      <span class="nav-icon">&#128184;</span><span class="nav-label">Salary</span>
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="shop-info"><span class="shop-dot"></span><span>Shop is Open</span></div>
+  </div>
+</aside>
+
+<main class="main-content" id="mainContent">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1 class="page-title" id="pageTitle">Dashboard</h1>
+      <span class="page-date" id="pageDate"></span>
+    </div>
+    <div class="topbar-right">
+      <div class="search-box">
+        <span>&#128269;</span>
+        <input type="text" placeholder="Search..." id="globalSearch"/>
+      </div>
+      <div class="avatar">PMC</div>
+    </div>
+  </header>
+
+  <!-- DASHBOARD PAGE -->
+  <section class="page active" id="page-dashboard">
+    <div class="stats-grid">
+      <div class="stat-card cyan">
+        <div class="stat-icon">&#128722;</div>
+        <div class="stat-info">
+          <p class="stat-label">Today's Sales</p>
+          <h2 class="stat-value" id="dashTodaySales">Rs.0</h2>
+          <span class="stat-change positive">Sales today</span>
+        </div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-icon">&#128179;</div>
+        <div class="stat-info">
+          <p class="stat-label">Total Revenue</p>
+          <h2 class="stat-value" id="dashRevenue">Rs.0</h2>
+          <span class="stat-change positive">All time</span>
+        </div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-icon">&#128241;</div>
+        <div class="stat-info">
+          <p class="stat-label">Recharges Today</p>
+          <h2 class="stat-value" id="dashRecharges">0</h2>
+          <span class="stat-change positive">Today</span>
+        </div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">&#128184;</div>
+        <div class="stat-info">
+          <p class="stat-label">Salary Due</p>
+          <h2 class="stat-value" id="dashSalaryDue">Rs.0</h2>
+          <span class="stat-change negative">Pending</span>
+        </div>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card wide">
+        <div class="chart-header"><h3>Sales Overview (Last 7 Days)</h3></div>
+        <canvas id="salesChart" height="200"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header"><h3>Sales by Category</h3></div>
+        <canvas id="categoryChart" height="200"></canvas>
+      </div>
+    </div>
+    <div class="recent-section">
+      <div class="recent-card">
+        <h3 class="recent-title">Recent Sales</h3>
+        <table class="data-table">
+          <thead><tr><th>Item</th><th>Category</th><th>Amount</th><th>Date</th></tr></thead>
+          <tbody id="dashRecentSalesTbody"></tbody>
+        </table>
+      </div>
+      <div class="recent-card">
+        <h3 class="recent-title">Recent Recharges</h3>
+        <table class="data-table">
+          <thead><tr><th>Mobile</th><th>Operator</th><th>Amount</th><th>Date</th></tr></thead>
+          <tbody id="dashRecentRechargeTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- SALES PAGE -->
+  <section class="page" id="page-sales">
+    <div class="page-actions">
+      <button class="btn btn-primary" id="addSaleBtn">+ Add Sale</button>
+      <div class="filter-group">
+        <select id="salesCategoryFilter" class="input-field small">
+          <option value="">All Categories</option>
+          <option value="Mobile">Mobile</option>
+          <option value="Fridge">Fridge</option>
+          <option value="TV">TV</option>
+          <option value="Accessories">Accessories</option>
+          <option value="Other">Other</option>
+        </select>
+        <input type="date" id="salesDateFilter" class="input-field small"/>
+        <button class="btn btn-outline" id="clearSalesFilter">Clear</button>
+      </div>
+    </div>
+    <div class="data-card">
+      <div class="data-card-header">
+        <h3>All Sales Records</h3>
+        <span class="badge" id="salesCount">0 records</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table full">
+          <thead><tr><th>#</th><th>Item</th><th>Category</th><th>Qty</th><th>Price</th><th>Total</th><th>Payment</th><th>Date</th><th>Actions</th></tr></thead>
+          <tbody id="salesTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Add Sale Modal -->
+    <div class="modal-overlay" id="saleModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Add New Sale</h3>
+          <button class="modal-close" id="closeSaleModal">&times;</button>
+        </div>
+        <form class="modal-form" id="saleForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Item Name</label>
+              <input type="text" class="input-field" id="saleItem" placeholder="e.g. Samsung Galaxy A55" required/>
+            </div>
+            <div class="form-group">
+              <label>Category</label>
+              <select class="input-field" id="saleCategory" required>
+                <option value="">Select</option>
+                <option value="Mobile">Mobile</option>
+                <option value="Fridge">Fridge</option>
+                <option value="TV">TV</option>
+                <option value="Accessories">Accessories</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Quantity</label>
+              <input type="number" class="input-field" id="saleQty" min="1" value="1" required/>
+            </div>
+            <div class="form-group">
+              <label>Price per Unit (Rs.)</label>
+              <input type="number" class="input-field" id="salePrice" placeholder="0" required/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Payment Method</label>
+              <select class="input-field" id="salePayment" required>
+                <option value="Cash">Cash</option>
+                <option value="Online">Online</option>
+                <option value="Card">Card</option>
+                <option value="UPI">UPI</option>
+                <option value="Credit">Credit</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" class="input-field" id="saleDate" required/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Customer Name (optional)</label>
+            <input type="text" class="input-field" id="saleCustomer" placeholder="Customer name"/>
+          </div>
+          <div class="form-total">
+            <span>Total:</span>
+            <strong id="saleTotalPreview">Rs.0</strong>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" id="cancelSale">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Sale</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAYMENT HISTORY PAGE -->
+  <section class="page" id="page-payments">
+    <div class="page-actions">
+      <button class="btn btn-primary" id="addPaymentBtn">+ Add Payment</button>
+      <div class="filter-group">
+        <input type="month" id="paymentMonthFilter" class="input-field small"/>
+        <button class="btn btn-outline" id="clearPaymentFilter">Clear</button>
+      </div>
+    </div>
+    <div class="stats-mini-row">
+      <div class="mini-stat"><span>Total Received</span><strong id="totalReceived">Rs.0</strong></div>
+      <div class="mini-stat"><span>Cash</span><strong id="totalCash">Rs.0</strong></div>
+      <div class="mini-stat"><span>Online/UPI</span><strong id="totalOnline">Rs.0</strong></div>
+      <div class="mini-stat"><span>Credit Pending</span><strong id="totalCredit">Rs.0</strong></div>
+    </div>
+    <div class="data-card">
+      <div class="data-card-header">
+        <h3>Payment Records</h3>
+        <span class="badge" id="paymentCount">0 records</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table full">
+          <thead><tr><th>#</th><th>Description</th><th>Method</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+          <tbody id="paymentsTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Payment Modal -->
+    <div class="modal-overlay" id="paymentModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Add Payment Record</h3>
+          <button class="modal-close" id="closePaymentModal">&times;</button>
+        </div>
+        <form class="modal-form" id="paymentForm">
+          <div class="form-group">
+            <label>Description</label>
+            <input type="text" class="input-field" id="payDesc" placeholder="e.g. Sale of TV" required/>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Amount (Rs.)</label>
+              <input type="number" class="input-field" id="payAmount" placeholder="0" required/>
+            </div>
+            <div class="form-group">
+              <label>Method</label>
+              <select class="input-field" id="payMethod" required>
+                <option value="Cash">Cash</option>
+                <option value="UPI">UPI</option>
+                <option value="Online Transfer">Online Transfer</option>
+                <option value="Card">Card</option>
+                <option value="Credit">Credit (Pending)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Status</label>
+              <select class="input-field" id="payStatus">
+                <option value="Received">Received</option>
+                <option value="Pending">Pending</option>
+                <option value="Partial">Partial</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" class="input-field" id="payDate" required/>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" id="cancelPayment">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ONLINE PAYMENTS PAGE -->
+  <section class="page" id="page-online-payments">
+    <div class="page-actions">
+      <button class="btn btn-primary" id="addOnlinePayBtn">+ Add Online Payment</button>
+      <div class="filter-group">
+        <select id="onlinePayPlatformFilter" class="input-field small">
+          <option value="">All Platforms</option>
+          <option value="PhonePe">PhonePe</option>
+          <option value="GPay">GPay</option>
+          <option value="Paytm">Paytm</option>
+          <option value="NEFT/IMPS">NEFT/IMPS</option>
+          <option value="Other">Other</option>
+        </select>
+        <input type="month" id="onlinePayMonthFilter" class="input-field small"/>
+        <button class="btn btn-outline" id="clearOnlinePayFilter">Clear</button>
+      </div>
+    </div>
+    <div class="stats-mini-row">
+      <div class="mini-stat"><span>Total Online</span><strong id="totalOnlinePay">Rs.0</strong></div>
+      <div class="mini-stat"><span>PhonePe</span><strong id="totalPhonePe">Rs.0</strong></div>
+      <div class="mini-stat"><span>GPay</span><strong id="totalGPay">Rs.0</strong></div>
+      <div class="mini-stat"><span>Paytm</span><strong id="totalPaytm">Rs.0</strong></div>
+    </div>
+    <div class="data-card">
+      <div class="data-card-header">
+        <h3>Online Payment Records</h3>
+        <span class="badge" id="onlinePayCount">0 records</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table full">
+          <thead><tr><th>#</th><th>Description</th><th>Platform</th><th>Transaction ID</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+          <tbody id="onlinePayTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Online Payment Modal -->
+    <div class="modal-overlay" id="onlinePayModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Add Online Payment</h3>
+          <button class="modal-close" id="closeOnlinePayModal">&times;</button>
+        </div>
+        <form class="modal-form" id="onlinePayForm">
+          <div class="form-group">
+            <label>Description</label>
+            <input type="text" class="input-field" id="opDesc" placeholder="e.g. Mobile sale payment" required/>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Platform</label>
+              <select class="input-field" id="opPlatform" required>
+                <option value="PhonePe">PhonePe</option>
+                <option value="GPay">GPay</option>
+                <option value="Paytm">Paytm</option>
+                <option value="NEFT/IMPS">NEFT/IMPS</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Transaction ID</label>
+              <input type="text" class="input-field" id="opTxnId" placeholder="TXN..."/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Amount (Rs.)</label>
+              <input type="number" class="input-field" id="opAmount" placeholder="0" required/>
+            </div>
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" class="input-field" id="opDate" required/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select class="input-field" id="opStatus">
+              <option value="Success">Success</option>
+              <option value="Pending">Pending</option>
+              <option value="Failed">Failed</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" id="cancelOnlinePay">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- MOBILE RECHARGE PAGE -->
+  <section class="page" id="page-recharge">
+    <div class="page-actions">
+      <button class="btn btn-primary" id="addRechargeBtn">+ Add Recharge</button>
+      <div class="filter-group">
+        <select id="rechargeOperatorFilter" class="input-field small">
+          <option value="">All Operators</option>
+          <option value="Jio">Jio</option>
+          <option value="Airtel">Airtel</option>
+          <option value="Vi">Vi</option>
+          <option value="BSNL">BSNL</option>
+        </select>
+        <input type="date" id="rechargeDateFilter" class="input-field small"/>
+        <button class="btn btn-outline" id="clearRechargeFilter">Clear</button>
+      </div>
+    </div>
+    <div class="stats-mini-row">
+      <div class="mini-stat"><span>Total Recharges</span><strong id="totalRechargeAmt">Rs.0</strong></div>
+      <div class="mini-stat"><span>Jio</span><strong id="totalJio">Rs.0</strong></div>
+      <div class="mini-stat"><span>Airtel</span><strong id="totalAirtel">Rs.0</strong></div>
+      <div class="mini-stat"><span>Vi</span><strong id="totalVi">Rs.0</strong></div>
+    </div>
+    <div class="data-card">
+      <div class="data-card-header">
+        <h3>Recharge History</h3>
+        <span class="badge" id="rechargeCount">0 records</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table full">
+          <thead><tr><th>#</th><th>Mobile No.</th><th>Operator</th><th>Plan</th><th>Amount</th><th>Commission</th><th>Date</th><th>Actions</th></tr></thead>
+          <tbody id="rechargeTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Recharge Modal -->
+    <div class="modal-overlay" id="rechargeModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Add Mobile Recharge</h3>
+          <button class="modal-close" id="closeRechargeModal">&times;</button>
+        </div>
+        <form class="modal-form" id="rechargeForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Mobile Number</label>
+              <input type="tel" class="input-field" id="rechMobile" placeholder="10-digit number" maxlength="10" required/>
+            </div>
+            <div class="form-group">
+              <label>Operator</label>
+              <select class="input-field" id="rechOperator" required>
+                <option value="Jio">Jio</option>
+                <option value="Airtel">Airtel</option>
+                <option value="Vi">Vi</option>
+                <option value="BSNL">BSNL</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Plan / Pack</label>
+              <input type="text" class="input-field" id="rechPlan" placeholder="e.g. 28 days unlimited"/>
+            </div>
+            <div class="form-group">
+              <label>Amount (Rs.)</label>
+              <input type="number" class="input-field" id="rechAmount" placeholder="0" required/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Commission Earned (Rs.)</label>
+              <input type="number" class="input-field" id="rechCommission" placeholder="0" step="0.01"/>
+            </div>
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" class="input-field" id="rechDate" required/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Customer Name (optional)</label>
+            <input type="text" class="input-field" id="rechCustomer" placeholder="Customer name"/>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" id="cancelRecharge">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- STAFF PAGE -->
+  <section class="page" id="page-staff">
+    <div class="page-actions">
+      <button class="btn btn-primary" id="addStaffBtn">+ Add Staff</button>
+    </div>
+    <div class="staff-grid" id="staffGrid"></div>
+    <!-- Staff Modal -->
+    <div class="modal-overlay" id="staffModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="staffModalTitle">Add Staff Member</h3>
+          <button class="modal-close" id="closeStaffModal">&times;</button>
+        </div>
+        <form class="modal-form" id="staffForm">
+          <input type="hidden" id="staffEditId"/>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" class="input-field" id="staffName" placeholder="e.g. Rahul Kumar" required/>
+            </div>
+            <div class="form-group">
+              <label>Role</label>
+              <input type="text" class="input-field" id="staffRole" placeholder="e.g. Sales Executive" required/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Mobile</label>
+              <input type="tel" class="input-field" id="staffMobile" placeholder="10-digit number"/>
+            </div>
+            <div class="form-group">
+              <label>Joining Date</label>
+              <input type="date" class="input-field" id="staffJoining" required/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Monthly Salary (Rs.)</label>
+              <input type="number" class="input-field" id="staffSalary" placeholder="0" required/>
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <select class="input-field" id="staffStatus">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" id="cancelStaff">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="staffSubmitBtn">Add Staff</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- SALARY PAGE -->
+  <section class="page" id="page-salary">
+    <div class="page-actions">
+      <button class="btn btn-primary" id="addSalaryBtn">+ Pay Salary</button>
+      <div class="filter-group">
+        <input type="month" id="salaryMonthFilter" class="input-field small"/>
+        <button class="btn btn-outline" id="clearSalaryFilter">Clear</button>
+      </div>
+    </div>
+    <div class="stats-mini-row">
+      <div class="mini-stat"><span>Total Paid (Month)</span><strong id="totalSalaryPaid">Rs.0</strong></div>
+      <div class="mini-stat"><span>Total Due</span><strong id="totalSalaryDue">Rs.0</strong></div>
+      <div class="mini-stat"><span>Active Staff</span><strong id="activeStaffCount">0</strong></div>
+    </div>
+    <div class="data-card">
+      <div class="data-card-header">
+        <h3>Salary Records</h3>
+        <span class="badge" id="salaryCount">0 records</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table full">
+          <thead><tr><th>#</th><th>Staff</th><th>Role</th><th>Month</th><th>Base</th><th>Bonus</th><th>Deduction</th><th>Net Pay</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="salaryTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Salary Modal -->
+    <div class="modal-overlay" id="salaryModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Pay Salary</h3>
+          <button class="modal-close" id="closeSalaryModal">&times;</button>
+        </div>
+        <form class="modal-form" id="salaryForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Staff Member</label>
+              <select class="input-field" id="salaryStaffId" required>
+                <option value="">Select Staff</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Month</label>
+              <input type="month" class="input-field" id="salaryMonth" required/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Base Salary (Rs.)</label>
+              <input type="number" class="input-field" id="salaryBase" placeholder="0" required/>
+            </div>
+            <div class="form-group">
+              <label>Bonus (Rs.)</label>
+              <input type="number" class="input-field" id="salaryBonus" placeholder="0" value="0"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Deduction (Rs.)</label>
+              <input type="number" class="input-field" id="salaryDeduction" placeholder="0" value="0"/>
+            </div>
+            <div class="form-group">
+              <label>Net Pay (Rs.)</label>
+              <input type="number" class="input-field" id="salaryNetPay" readonly/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Payment Method</label>
+              <select class="input-field" id="salaryPayMethod">
+                <option value="Cash">Cash</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="UPI">UPI</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <select class="input-field" id="salaryStatus">
+                <option value="Paid">Paid</option>
+                <option value="Pending">Pending</option>
+                <option value="Partial">Partial</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea class="input-field" id="salaryNotes" rows="2" placeholder="Optional notes..."></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" id="cancelSalary">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Salary</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
